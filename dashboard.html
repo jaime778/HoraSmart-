@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Tráfico - HoraSmart Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f9ff;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border-left: 4px solid #2563eb;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card.blue { border-left-color: #2563eb; }
+        .stat-card.green { border-left-color: #16a34a; }
+        .stat-card.pink { border-left-color: #ec4899; }
+        .stat-card.orange { border-left-color: #f59e0b; }
+        .stat-card.purple { border-left-color: #8b5cf6; }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive {
+            color: #16a34a;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .chart-card h3 {
+            font-size: 1.25rem;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .table-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            margin-bottom: 2rem;
+        }
+
+        .table-card h3 {
+            font-size: 1.25rem;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f1f5f9;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-pink {
+            background: #fbcfe8;
+            color: #be185d;
+        }
+
+        .badge-orange {
+            background: #fed7aa;
+            color: #b45309;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #64748b;
+        }
+
+        .no-data-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .filter-group select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .refresh-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .refresh-indicator.updating {
+            color: #2563eb;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #e2e8f0;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📊 Dashboard de Tráfico</h1>
+                <p style="color: #64748b; margin: 0.5rem 0 0 0;">HoraSmart Analytics</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="refreshData()">🔄 Actualizar</button>
+                <button class="btn-secondary" onclick="downloadReport()">📥 Descargar Reporte</button>
+                <button class="btn-danger" onclick="clearAllData()">🗑️ Limpiar Datos</button>
+            </div>
+        </header>
+
+        <div class="filter-section">
+            <div class="filter-group">
+                <label>Filtrar por:</label>
+                <select id="filterSelect" onchange="applyFilter()">
+                    <option value="all">Todas las sesiones</option>
+                    <option value="today">Hoy</option>
+                    <option value="week">Esta semana</option>
+                    <option value="month">Este mes</option>
+                </select>
+            </div>
+            <div class="refresh-indicator" id="refreshIndicator">
+                <span>Última actualización: <strong id="lastUpdate">Hace poco</strong></span>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Dispositivos Utilizados</h3>
+                <div class="chart-container">
+                    <canvas id="devicesChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Navegadores</h3>
+                <div class="chart-container">
+                    <canvas id="browsersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Sistemas Operativos</h3>
+                <div class="chart-container">
+                    <canvas id="osChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Distribución de Tiempo en Página</h3>
+                <div class="chart-container">
+                    <canvas id="timeDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <h3>Últimas Sesiones</h3>
+            <div id="sessionsTable"></div>
+        </div>
+
+        <footer>
+            <p>© 2024 HoraSmart Analytics. Todos los derechos reservados.</p>
+            <p>Los datos se almacenan localmente en tu navegador.</p>
+        </footer>
+    </div>
+
+    <script src="traffic-tracker.js"></script>
+    <script>
+        let charts = {};
+        let filteredData = [];
+
+        function initializeDashboard() {
+            loadTrafficData();
+            renderStats();
+            renderCharts();
+            renderSessionsTable();
+            updateLastUpdate();
+
+            // Actualizar cada 30 segundos
+            setInterval(() => {
+                loadTrafficData();
+                renderStats();
+                updateCharts();
+                renderSessionsTable();
+                updateLastUpdate();
+            }, 30000);
+        }
+
+        function loadTrafficData() {
+            filteredData = window.trafficTracker.getAllSessions();
+        }
+
+        function applyFilter() {
+            const filter = document.getElementById('filterSelect').value;
+            const allSessions = window.trafficTracker.getAllSessions();
+            const now = new Date();
+
+            filteredData = allSessions.filter(session => {
+                const sessionDate = new Date(session.startTime);
+
+                if (filter === 'today') {
+                    return sessionDate.toDateString() === now.toDateString();
+                } else if (filter === 'week') {
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return sessionDate >= weekAgo;
+                } else if (filter === 'month') {
+                    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    return sessionDate >= monthAgo;
+                }
+                return true;
+            });
+
+            renderStats();
+            updateCharts();
+            renderSessionsTable();
+        }
+
+        function renderStats() {
+            if (filteredData.length === 0) {
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="no-data">
+                        <div class="no-data-icon">📊</div>
+                        <p>No hay datos de tráfico aún. Navega por la página para generar datos.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalSessions = filteredData.length;
+            const totalTimeOnPage = filteredData.reduce((sum, s) => sum + s.timeOnPage, 0);
+            const avgTimeOnPage = Math.round(totalTimeOnPage / totalSessions);
+            const avgScrollDepth = Math.round(filteredData.reduce((sum, s) => sum + s.scrollDepth, 0) / totalSessions);
+            const totalClicks = filteredData.reduce((sum, s) => sum + s.totalClicks, 0);
+            const avgClicks = Math.round(totalClicks / totalSessions);
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card blue">
+                    <div class="stat-label">Total de Sesiones</div>
+                    <div class="stat-value">${totalSessions}</div>
+                    <div class="stat-change positive">↑ Activo</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Tiempo Promedio</div>
+                    <div class="stat-value">${avgTimeOnPage}s</div>
+                    <div class="stat-change">Total: ${Math.round(totalTimeOnPage / 60)}m</div>
+                </div>
+                <div class="stat-card pink">
+                    <div class="stat-label">Profundidad de Scroll</div>
+                    <div class="stat-value">${avgScrollDepth}%</div>
+                    <div class="stat-change">Promedio</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-label">Total de Clics</div>
+                    <div class="stat-value">${totalClicks}</div>
+                    <div class="stat-change">Promedio: ${avgClicks}</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">Dispositivos Únicos</div>
+                    <div class="stat-value">${countUniqueDevices()}</div>
+                    <div class="stat-change">Tipos detectados</div>
+                </div>
+            `;
+        }
+
+        function countUniqueDevices() {
+            const devices = new Set();
+            filteredData.forEach(session => {
+                devices.add(session.deviceInfo.device);
+            });
+            return devices.size;
+        }
+
+        function renderCharts() {
+            renderDevicesChart();
+            renderBrowsersChart();
+            renderOSChart();
+            renderTimeDistributionChart();
+        }
+
+        function updateCharts() {
+            if (charts.devices) charts.devices.destroy();
+            if (charts.browsers) charts.browsers.destroy();
+            if (charts.os) charts.os.destroy();
+            if (charts.timeDistribution) charts.timeDistribution.destroy();
+            renderCharts();
+        }
+
+        function renderDevicesChart() {
+            const devices = {};
+            filteredData.forEach(session => {
+                const device = session.deviceInfo.device;
+                devices[device] = (devices[device] || 0) + 1;
+            });
+
+            const ctx = document.getElementById('devicesChart').getContext('2d');
+            charts.devices = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(devices),
+                    datasets: [{
+                        data: Object.values(devices),
+                        backgroundColor: [
+                            '#2563eb',
+                            '#16a34a',
+                            '#ec4899',
+                            '#f59e0b',
+                            '#8b5cf6'
+                        ],
+                        borderColor: 'white',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 12 },
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderBrowsersChart() {
+            const browsers = {};
+            filteredData.forEach(session => {
+                const browser = session.deviceInfo.browser;
+                browsers[browser] = (browsers[browser] || 0) + 1;
+            });
+
+            const ctx = document.getElementById('browsersChart').getContext('2d');
+            charts.browsers = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(browsers),
+                    datasets: [{
+                        label: 'Sesiones',
+                        data: Object.values(browsers),
+                        backgroundColor: '#2563eb',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { font: { size: 12 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderOSChart() {
+            const os = {};
+            filteredData.forEach(session => {
+                const osName = session.deviceInfo.os;
+                os[osName] = (os[osName] || 0) + 1;
+            });
+
+            const ctx = document.getElementById('osChart').getContext('2d');
+            charts.os = new Chart(ctx, {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(os),
+                    datasets: [{
+                        data: Object.values(os),
+                        backgroundColor: [
+                            '#2563eb',
+                            '#16a34a',
+                            '#ec4899',
+                            '#f59e0b',
+                            '#8b5cf6'
+                        ],
+                        borderColor: 'white',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTimeDistributionChart() {
+            const timeRanges = {
+                '0-10s': 0,
+                '10-30s': 0,
+                '30-60s': 0,
+                '1-5m': 0,
+                '5m+': 0
+            };
+
+            filteredData.forEach(session => {
+                const time = session.timeOnPage;
+                if (time < 10) timeRanges['0-10s']++;
+                else if (time < 30) timeRanges['10-30s']++;
+                else if (time < 60) timeRanges['30-60s']++;
+                else if (time < 300) timeRanges['1-5m']++;
+                else timeRanges['5m+']++;
+            });
+
+            const ctx = document.getElementById('timeDistributionChart').getContext('2d');
+            charts.timeDistribution = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(timeRanges),
+                    datasets: [{
+                        label: 'Sesiones',
+                        data: Object.values(timeRanges),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { font: { size: 12 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderSessionsTable() {
+            const container = document.getElementById('sessionsTable');
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <p>No hay sesiones para mostrar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedSessions = [...filteredData].sort((a, b) => 
+                new Date(b.startTime) - new Date(a.startTime)
+            ).slice(0, 10);
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Dispositivo</th>
+                            <th>Navegador</th>
+                            <th>Tiempo (s)</th>
+                            <th>Scroll (%)</th>
+                            <th>Clics</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            sortedSessions.forEach(session => {
+                const date = new Date(session.startTime);
+                const dateStr = date.toLocaleDateString('es-ES') + ' ' + date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+                html += `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td><span class="badge badge-blue">${session.deviceInfo.device}</span></td>
+                        <td><span class="badge badge-green">${session.deviceInfo.browser}</span></td>
+                        <td>${session.timeOnPage}s</td>
+                        <td>${session.scrollDepth}%</td>
+                        <td>${session.totalClicks}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function updateLastUpdate() {
+            const lastUpdate = localStorage.getItem('lastUpdate');
+            if (lastUpdate) {
+                const date = new Date(lastUpdate);
+                const now = new Date();
+                const diff = Math.floor((now - date) / 1000);
+
+                let timeStr;
+                if (diff < 60) timeStr = 'Hace poco';
+                else if (diff < 3600) timeStr = `Hace ${Math.floor(diff / 60)}m`;
+                else timeStr = `Hace ${Math.floor(diff / 3600)}h`;
+
+                document.getElementById('lastUpdate').textContent = timeStr;
+            }
+        }
+
+        function refreshData() {
+            const indicator = document.getElementById('refreshIndicator');
+            indicator.classList.add('updating');
+            indicator.innerHTML = '<span class="spinner"></span> Actualizando...';
+
+            setTimeout(() => {
+                loadTrafficData();
+                renderStats();
+                updateCharts();
+                renderSessionsTable();
+                updateLastUpdate();
+                indicator.classList.remove('updating');
+                indicator.innerHTML = '<span>Última actualización: <strong id="lastUpdate">Ahora</strong></span>';
+            }, 500);
+        }
+
+        function downloadReport() {
+            const data = window.trafficTracker.exportData();
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `reporte_trafico_${new Date().getTime()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAllData() {
+            if (confirm('¿Estás seguro de que deseas eliminar todos los datos de tráfico? Esta acción no se puede deshacer.')) {
+                window.trafficTracker.clearData();
+                loadTrafficData();
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="no-data">
+                        <div class="no-data-icon">📊</div>
+                        <p>Datos eliminados. Navega por la página para generar nuevos datos.</p>
+                    </div>
+                `;
+                document.getElementById('sessionsTable').innerHTML = `
+                    <div class="no-data">
+                        <p>No hay sesiones para mostrar</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeDashboard);
+        } else {
+            initializeDashboard();
+        }
+    </script>
+</body>
+</html>
