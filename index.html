@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoraSmart - Tienda de Smartwatches Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; line-height: 1.6; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; font-weight: 700; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+
+        header {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
+            border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header-content { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; }
+        .logo-section { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-section img { height: 48px; width: auto; }
+        .brand-info h1 { font-size: 1.5rem; color: #1e293b; margin: 0; }
+        .brand-info p { font-size: 0.75rem; color: #64748b; margin: 0; }
+        nav { display: flex; gap: 2rem; align-items: center; }
+        nav a { color: #475569; text-decoration: none; transition: color 0.3s; font-weight: 500; }
+        nav a:hover { color: #2563eb; }
+        .tracker-btn { background: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; border: none; font-weight: 600; transition: all 0.3s; }
+        .tracker-btn:hover { background: #1d4ed8; }
+        @media (max-width: 768px) { nav { display: flex; flex-direction: column; gap: 1rem; } }
+
+        .hero {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white; padding: 4rem 0; text-align: center;
+        }
+        .hero h2 { font-size: 3rem; margin-bottom: 1.5rem; }
+        .hero p { font-size: 1.25rem; color: #dbeafe; margin-bottom: 2rem; max-width: 42rem; margin-left: auto; margin-right: auto; }
+
+        .btn {
+            display: inline-block; padding: 0.75rem 2rem; border-radius: 0.5rem;
+            text-decoration: none; border: none; cursor: pointer; font-weight: 600;
+            transition: all 0.3s; font-size: 1rem;
+        }
+        .btn-primary { background: white; color: #2563eb; }
+        .btn-primary:hover { background: #f1f5f9; }
+        .btn-secondary { background: #2563eb; color: white; border: 2px solid #2563eb; }
+        .btn-secondary:hover { background: #1d4ed8; }
+        .btn-outline { background: transparent; color: #1e293b; border: 2px solid #e2e8f0; }
+        .btn-outline:hover { border-color: #2563eb; color: #2563eb; }
+        .btn-nequi { background: #ff6b35; color: white; }
+        .btn-nequi:hover { background: #e55a2b; }
+        .btn-paypal { background: #003087; color: white; }
+        .btn-paypal:hover { background: #001f5c; }
+
+        .products-section { padding: 4rem 0; }
+        .section-title { font-size: 2.25rem; text-align: center; margin-bottom: 3rem; color: #1e293b; }
+        .products-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem; margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: white; border-radius: 0.75rem; overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.3s; cursor: pointer;
+        }
+        .product-card:hover { box-shadow: 0 20px 25px rgba(0,0,0,0.15); transform: translateY(-4px); }
+
+        .product-image { position: relative; overflow: hidden; background: #f1f5f9; aspect-ratio: 1; }
+        .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .product-card:hover .product-image img { transform: scale(1.1); }
+
+        .discount-badge {
+            position: absolute; top: 0.75rem; left: 0.75rem;
+            background: #ef4444; color: white; padding: 0.5rem 0.75rem;
+            border-radius: 9999px; font-size: 0.875rem; font-weight: 600;
+        }
+
+        .like-btn {
+            position: absolute; top: 0.75rem; right: 0.75rem;
+            background: white; border: none; border-radius: 9999px; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s;
+        }
+        .like-btn:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .like-btn.liked svg { fill: #ef4444; color: #ef4444; }
+
+        .product-info { padding: 1rem; }
+        .product-name { font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-description { font-size: 0.875rem; color: #64748b; margin-bottom: 0.75rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .rating { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .stars { display: flex; gap: 0.25rem; }
+        .star { width: 14px; height: 14px; fill: #fbbf24; color: #fbbf24; }
+        .star.empty { fill: #e5e7eb; color: #e5e7eb; }
+        .review-count { font-size: 0.75rem; color: #64748b; }
+
+        .price-section { margin-bottom: 1rem; }
+        .price { font-size: 1.5rem; font-weight: 700; color: #2563eb; }
+        .original-price { font-size: 0.875rem; color: #94a3b8; text-decoration: line-through; margin-left: 0.5rem; }
+        .product-card .btn { width: 100%; text-align: center; }
+
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 100;
+            align-items: center; justify-content: center; padding: 1rem; overflow-y: auto;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: 0.75rem; max-width: 48rem; width: 100%;
+            max-height: 90vh; overflow-y: auto; padding: 1.5rem; margin: auto;
+        }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .modal-grid { grid-template-columns: 1fr; } }
+
+        .modal-image { background: #f1f5f9; border-radius: 0.5rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+        .modal-image img { width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem; }
+
+        .modal-details h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .modal-details .rating { margin-bottom: 1rem; }
+        .modal-price { margin-bottom: 1.5rem; }
+        .modal-price .price { font-size: 2rem; }
+        .modal-description { color: #475569; margin-bottom: 1.5rem; }
+
+        .features-list { margin-bottom: 1.5rem; }
+        .features-list h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+        .features-list ul { list-style: none; }
+        .features-list li { display: flex; align-items: center; gap: 0.5rem; color: #475569; margin-bottom: 0.5rem; }
+        .feature-dot { width: 8px; height: 8px; background: #2563eb; border-radius: 9999px; }
+
+        .payment-buttons { display: flex; flex-direction: column; gap: 0.75rem; }
+        .payment-buttons a { text-decoration: none; }
+        .payment-buttons .btn { width: 100%; }
+
+        .reviews-section { padding: 4rem 0; background: #f1f5f9; }
+        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+
+        .review-card { background: white; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .review-header { display: flex; align-items: start; justify-content: space-between; margin-bottom: 0.75rem; }
+        .review-author { font-weight: 600; color: #1e293b; margin-bottom: 0.25rem; }
+        .review-date { font-size: 0.875rem; color: #64748b; }
+        .verified-badge { font-size: 0.75rem; background: #dcfce7; color: #15803d; padding: 0.25rem 0.5rem; border-radius: 9999px; }
+        .review-rating { display: flex; gap: 0.25rem; margin-bottom: 0.75rem; }
+        .review-title { font-weight: 600; color: #1e293b; margin-bottom: 0.5rem; }
+        .review-comment { color: #475569; font-size: 0.95rem; }
+
+        .pagination { display: flex; justify-content: center; gap: 0.5rem; }
+        .pagination button {
+            padding: 0.5rem 1rem; border: 2px solid #e2e8f0; background: white;
+            color: #475569; border-radius: 0.5rem; cursor: pointer; transition: all 0.3s; font-weight: 500;
+        }
+        .pagination button.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .pagination button:hover { border-color: #2563eb; color: #2563eb; }
+
+        .contact-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white; padding: 4rem 0;
+        }
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+        .contact-item { text-align: center; }
+        .contact-icon {
+            width: 64px; height: 64px; border-radius: 9999px;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+            background: #2563eb;
+        }
+        .contact-icon svg { width: 32px; height: 32px; }
+        .contact-item h3 { margin-bottom: 0.5rem; }
+        .contact-item a { color: #93c5fd; text-decoration: none; transition: color 0.3s; }
+        .contact-item a:hover { color: #bfdbfe; }
+
+        .social-links {
+            display: flex; justify-content: center; gap: 1.5rem;
+            padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .social-links a { color: white; text-decoration: none; transition: color 0.3s; }
+        .social-links a:hover { color: #93c5fd; }
+        .social-links svg { width: 24px; height: 24px; }
+
+        footer {
+            background: #0f172a; color: #94a3b8; padding: 2rem 0;
+            text-align: center; border-top: 1px solid #1e293b;
+        }
+        footer p { margin: 0.5rem 0; }
+
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 2rem; }
+            .hero p { font-size: 1rem; }
+            .section-title { font-size: 1.875rem; }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+            .modal-content { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663389797849/XJZb4VUWU8Fm7YHhzUnWnh/horasmart-logo_bff18b41.png" alt="HoraSmart Logo">
+                    <div class="brand-info">
+                        <h1>HoraSmart</h1>
+                        <p>Smartwatches de Calidad</p>
+                    </div>
+                </div>
+                <nav>
+                    <a href="#productos">Productos</a>
+                    <a href="#resenas">Reseñas</a>
+                    <a href="#contacto">Contacto</a>
+                    <button class="tracker-btn" onclick="openTracker()">📊 Analytics</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Tecnología en tu Muñeca</h2>
+            <p>Descubre nuestra colección de smartwatches premium con las mejores características y precios del mercado</p>
+            <a href="#productos" class="btn btn-primary">Ver Productos</a>
+        </div>
+    </section>
+
+    <section id="productos" class="products-section">
+        <div class="container">
+            <h2 class="section-title">Nuestros Smartwatches</h2>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+    </section>
+
+    <div class="modal" id="productModal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <section id="resenas" class="reviews-section">
+        <div class="container">
+            <h2 class="section-title">Reseñas de Clientes</h2>
+            <div class="reviews-grid" id="reviewsGrid"></div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </section>
+
+    <section id="contacto" class="contact-section">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">Contacto</h2>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                    </div>
+                    <h3>Teléfono</h3>
+                    <a href="tel:+573186632478">+57 318 663 2478</a>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon" style="background: #16a34a;">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.869 1.271c-1.613.947-2.605 2.457-2.605 4.142 0 1.21.37 2.381 1.07 3.426l-1.136 4.154 4.254-1.108c.995.537 2.122.817 3.286.817h.003c5.407 0 9.806-4.398 9.806-9.805 0-2.622-1.02-5.088-2.87-6.945A9.823 9.823 0 0011.051 6.979z"/></svg>
+                    </div>
+                    <h3>WhatsApp</h3>
+                    <a href="https://wa.me/message/AUNZIFAYM5ZWG1" target="_blank">Enviar Mensaje</a>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon" style="background: #ec4899;">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.322a1.44 1.44 0 110-2.88 1.44 1.44 0 010 2.88z"/></svg>
+                    </div>
+                    <h3>Instagram</h3>
+                    <a href="https://www.instagram.com/horasmart?igsh=MWZncGpmaTVzbWlvYQ==" target="_blank">@horasmart</a>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="https://www.tiktok.com/@horasmart?_r=1&_t=ZS-94IrWFdR9Zw" id="link-tiktok" target="_blank" title="TikTok">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.86 2.86 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.01-.01z"/></svg>
+                </a>
+                <a href="https://wa.me/message/AUNZIFAYM5ZWG1" id="link-whatsapp" target="_blank" title="WhatsApp">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+                </a>
+                <a href="https://www.facebook.com/share/1P87yYyyyK/" id="link-facebook" target="_blank" title="Facebook">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 HoraSmart. Todos los derechos reservados.</p>
+            <p>Smartwatches de calidad a los mejores precios</p>
+        </div>
+    </footer>
+
+    <script>
+        let products = [
+        
+            {
+                id: 00,
+                name: "HoraSmart",
+                price: 149950,
+                originalPrice: 271046,
+                image: "foto00.png",
+                rating: 4.5,
+                reviews: 500,
+                description: "Reloj Smartwatch 2025 nuevo AI diagnóstico lípidos en sangre ácido úrico",
+                features: ["Pantalla táctil 1.96", "oxigeno en sangre","evaluacion de riesgo de acido urico", "evaluacion de riesgos lipidos","temperatura corporal", "presion arterial", "monitor de frecuencia cardiaca", "detector de diagnostico AI", "rastreo de sueño","podometro","recordatorio de llamadas entrantes","sincronizacion de notificaciones","multiples caras de reloj","alarma","control remoto de la camara","musica Bluetooth", "Bluetooth 5.3","clima","sensor de gravedad","impermeable IP68","compatible con IPHONE y ANDROID"],
+                color: "Negro"
+            },  
+            {
+                id: 0,
+                name: "HoraSmart",
+                price: 60095,
+                originalPrice: 79999,
+                image: "foto0.png",
+                rating: 4.9,
+                reviews: 200,
+                description: "Reloj Smartwatch  con pantalla tactil 1.83 pulgadas",
+                features: ["Pantalla táctil 1.83", "Llamadas inalambricas", "alertas de mensajes", "multiples modos deportivos", "contro remoto e camara", "cuerpo de metal", "contador de pasos", "compatible con IPHONE y ANDROID"],
+                color: "Gris Plateado"
+            },     
+            {
+                id: 1,
+                name: "HoraSmart",
+                price: 49950,
+                originalPrice: 79995,
+                image: "foto1.png",
+                rating: 4,
+                reviews: 21,
+                description: "Reloj inteligente cuadrado con pantalla tactil",
+                features: ["Pantalla táctil 1.83", "Llamadas bluetooth", "23+ modos deportivos", "Musica bluetooth ", "Recordatorio De llamadas", "Recordatorio de SMS", "Recordatorio de Mensajes de Aplicaciones Sociales", "Recordatorio de Alarma", "Recordatorio de Asiento", "Multi-Movimiento", "Activacion de Pantalla al Girar la Mano", "Localizador de Pulsera", "Localizador de Telefono", "Foto Remota", "Modo de no Molestar", "Contacto de uso Frecuente", "Siri", "Contro de Musica", "Clima", "Calculadora", "Lampara de Noche"],
+                color: "Purpura"
+            },
+            {
+                id: 2,
+                name: "HoraSmart",
+                price: 49950,
+                originalPrice: 79995,
+                image: "foto2.png",
+                rating: 4,
+                reviews: 21,
+                description: "Reloj inteligente cuadrado con pantalla tactil",
+                features: ["Pantalla táctil 1.83", "Llamadas bluetooth", "23+ modos deportivos", "Musica bluetooth ", "Recordatorio De llamadas", "Recordatorio de SMS", "Recordatorio de Mensajes de Aplicaciones Sociales", "Recordatorio de Alarma", "Recordatorio de Asiento", "Multi-Movimiento", "Activacion de Pantalla al Girar la Mano", "Localizador de Pulsera", "Localizador de Telefono", "Foto Remota", "Modo de no Molestar", "Contacto de uso Frecuente", "Siri", "Contro de Musica", "Clima", "Calculadora", "Lampara de Noche"],
+                color: "Azul"
+            },
+            {
+                id: 3,
+                name: "HoraSmart",
+                price: 49950,
+                originalPrice: 79950,
+                image: "foto3.png",
+                rating: 4,
+                reviews: 21,
+                description: "Reloj inteligente cuadrado con pantalla tactil",
+                features: ["Pantalla táctil 1.83", "Llamadas bluetooth", "23+ modos deportivos", "Musica bluetooth ", "Recordatorio De llamadas", "Recordatorio de SMS", "Recordatorio de Mensajes de Aplicaciones Sociales", "Recordatorio de Alarma", "Recordatorio de Asiento", "Multi-Movimiento", "Activacion de Pantalla al Girar la Mano", "Localizador de Pulsera", "Localizador de Telefono", "Foto Remota", "Modo de no Molestar", "Contacto de uso Frecuente", "Siri", "Contro de Musica", "Clima", "Calculadora", "Lampara de Noche"],
+                color: "Rosa"
+            },
+            {
+                id: 4,
+                name: "HoraSmart",
+                price: 50100,
+                originalPrice: 79950,
+                image: "foto4.png",
+                rating: 4,
+                reviews: 21,
+                description: "Reloj inteligente cuadrado con pantalla tactil",
+                features: ["Pantalla táctil 1.83", "Llamadas bluetooth", "23+ modos deportivos", "Musica bluetooth ", "Recordatorio De llamadas", "Recordatorio de SMS", "Recordatorio de Mensajes de Aplicaciones Sociales", "Recordatorio de Alarma", "Recordatorio de Asiento", "Multi-Movimiento", "Activacion de Pantalla al Girar la Mano", "Localizador de Pulsera", "Localizador de Telefono", "Foto Remota", "Modo de no Molestar", "Contacto de uso Frecuente", "Siri", "Contro de Musica", "Clima", "Calculadora", "Lampara de Noche"],
+                color: "Negro"
+            },
+            {
+                id: 5,
+                name: "HoraSmart",
+                price: 44990,
+                originalPrice: 72360,
+                image: "foto5.png",
+                rating: 4.9,
+                reviews: 370,
+                description: "2026 nuevo reloj inteligente para hombre, regalo para mujer",
+                features: ["Función para ver", "llamada BT", "modos deportivos", "monitoreo del sueño", "monitor de salud", "música BT", "cámara BT", "recordatorio de mensajes en tiempo real", "voz AI", "temporizador", "cronómetro", "alarma", "calculadora", "registros de llamadas", "agenda telefónica", "búsqueda de dispositivos", "visualización del tiempo"],
+                color: "Gris"
+            },
+            {
+                id: 6,
+                name: "HoraSmart",
+                price: 44990,
+                originalPrice: 72360,
+                image: "foto6.png",
+                rating: 4.9,
+                reviews: 370,
+                description: "2026 nuevo reloj inteligente para hombre, regalo para mujer",
+                features: ["Función para ver", "llamada BT", "modos deportivos", "monitoreo del sueño", "monitor de salud", "música BT", "cámara BT", "recordatorio de mensajes en tiempo real", "voz AI", "temporizador", "cronómetro", "alarma", "calculadora", "registros de llamadas", "agenda telefónica", "búsqueda de dispositivos", "visualización del tiempo"],
+                color: "Rosa"
+            },
+            {
+                id: 7,
+                name: "HoraSmart",
+                price: 44990,
+                originalPrice: 72360,
+                image: "foto7.png",
+                rating: 4.9,
+                reviews: 370,
+                description: "2026 nuevo reloj inteligente para hombre, regalo para mujer",
+                features: ["Función para ver", "llamada BT", "modos deportivos", "monitoreo del sueño", "monitor de salud", "música BT", "cámara BT", "recordatorio de mensajes en tiempo real", "voz AI", "temporizador", "cronómetro", "alarma", "calculadora", "registros de llamadas", "agenda telefónica", "búsqueda de dispositivos", "visualización del tiempo"],
+                color: "Negro"
+            },
+            {
+                id: 8,
+                name: "HoraSmart",
+                price: 59965,
+                originalPrice: 114040,
+                image: "foto8.png",
+                rating: 5,
+                reviews: 99,
+                description: "Reloj Inteligente Lenovo para Niños con GPS",
+                features: ["Función para ver", "posicionamiento GPS", "monitorizacion remota", "despertador", "alarma de emergencia SOS", "apagado remoto", "linterna", "toma de fotografias", "juegos de calculo", "modo de prohibicion de llamadas", "geolocalizacion", "llamadas bidireccionales", "registro de trayectoria", "chat de voz", "recompensar de amor", "linterna", "boton unico derecho SOSO", "boton de interruptor"],
+                color: "Verde"
+            },
+            {
+                id: 9,
+                name: "HoraSmart",
+                price: 59965,
+                originalPrice: 114040,
+                image: "foto9.png",
+                rating: 5,
+                reviews: 99,
+                description: "Reloj Inteligente Lenovo para Niños con GPS",
+                features: ["Función para ver", "posicionamiento GPS", "monitorizacion remota", "despertador", "alarma de emergencia SOS", "apagado remoto", "linterna", "toma de fotografias", "juegos de calculo", "modo de prohibicion de llamadas", "geolocalizacion", "llamadas bidireccionales", "registro de trayectoria", "chat de voz", "recompensar de amor", "linterna", "boton unico derecho SOSO", "boton de interruptor"],
+                color: "Purpura"
+            },
+            {
+            id: 10,
+                name: "HoraSmart",
+                price: 59965,
+                originalPrice: 114040,
+                image: "foto10.png",
+                rating: 5,
+                reviews: 99,
+                description: "Reloj Inteligente Lenovo para Niños con GPS",
+                features: ["Función para ver", "posicionamiento GPS", "monitorizacion remota", "despertador", "alarma de emergencia SOS", "apagado remoto", "linterna", "toma de fotografias", "juegos de calculo", "modo de prohibicion de llamadas", "geolocalizacion", "llamadas bidireccionales", "registro de trayectoria", "chat de voz", "recompensar de amor", "linterna", "boton unico derecho SOSO", "boton de interruptor"],
+                color: "Rojo"
+                
+             },
+            {
+            id: 11,
+                name: "HoraSmart",
+                price: 50562,
+                originalPrice: 80040,
+                image: "foto11.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                color: "Negro"  
+             },
+            {
+            id: 12,
+                name: "HoraSmart",
+                price: 60562,
+                originalPrice: 90640,
+                image: "foto12.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                color: "Oro" 
+             },
+            {
+            id: 13,
+                name: "HoraSmart",
+                price: 62562,
+                originalPrice: 90840,
+                image: "foto13.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                color: "Negro"
+             },
+            {
+            id: 14,
+                name: "HoraSmart",
+                price: 51562,
+                originalPrice: 80740,
+                image: "foto14.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                color: "Plateado"  
+                
+              },
+            {
+            id: 15,
+                name: "HoraSmart",
+                price: 52562,
+                originalPrice: 80340,
+                image: "foto15.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                color: "Rosa" 
+                
+             },
+            {
+            id: 16,
+                name: "HoraSmart",
+                price: 49995,
+                originalPrice: 77140,
+                image: "foto16.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                 color: "Rosa"
+               
+              },
+            {
+            id: 17,
+                name: "HoraSmart",
+                price: 49989,
+                originalPrice: 78240,
+                image: "foto17.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                color: "Oro" 
+                
+              },
+            {
+            id: 18,
+                name: "HoraSmart",
+                price: 50100,
+                originalPrice: 78740,
+                image: "foto18.png",
+                rating: 5,
+                reviews: 50,
+                description: "2026 Nuevo reloj inteligente para Hombre y Mujer",
+                features: ["Función para ver", "monitor de frecuencia cardiaca", "otros", "monitor de oxigeno en sangre", "monitor de temperatura corporal", "monitor de estres", "GPS", "multiples esferas", "rastreador de actividad", "pantalla de 1800 pulgadas 240*280", "pantalla tactil", "bateria 180 mAh", "resistente al agua:IP67", "Bluetooth:BLE 5.0", "Android superior a 5.0 o IOS superior a 9.0"],
+                color: "Plateado"  
+                                
+             },
+        ];
+
+        let socialLinks = {
+            tiktok: "https://www.tiktok.com/@horasmart?_r=1&_t=ZS-94IrWFdR9Zw",
+            whatsapp: "https://wa.me/message/AUNZIFAYM5ZWG1",
+            facebook: "https://www.facebook.com/share/1P87yYyyyK/"
+        };
+
+        const reviews = [
+            { id: 1, author: "Carlos Mendez", rating: 5, date: "2024-02-15", title: "¡Excelente reloj!", comment: "Superó mis expectativas. La batería dura mucho y la pantalla es muy clara. Recomendado 100%.", verified: true },
+            { id: 2, author: "María García", rating: 5, date: "2024-02-10", title: "Perfecto para deporte", comment: "Lo uso para entrenar y funciona perfectamente. Muy resistente y cómodo de llevar.", verified: true },
+            { id: 3, author: "Juan López", rating: 4, date: "2024-02-05", title: "Muy buena relación precio-calidad", comment: "Buen reloj por este precio. Algunas funciones podrían mejorar, pero en general estoy satisfecho.", verified: true },
+            { id: 4, author: "Ana Rodríguez", rating: 5, date: "2024-01-28", title: "Entrega rápida y producto de calidad", comment: "Llegó en perfecto estado. El servicio al cliente fue excelente. Muy recomendado.", verified: true },
+            { id: 5, author: "Pedro Sánchez", rating: 5, date: "2024-01-20", title: "Mejor que otros smartwatches más caros", comment: "Tiene todas las funciones que necesito y cuesta mucho menos que la competencia.", verified: true },
+            { id: 6, author: "Laura Fernández", rating: 4, date: "2024-01-15", title: "Muy satisfecha", comment: "Funciona muy bien. Solo le falta un poco más de variedad en los modos deportivos.", verified: true },
+            { id: 7, author: "Roberto Díaz", rating: 5, date: "2024-01-10", title: "Compra segura", comment: "Excelente experiencia de compra. El producto llegó bien empacado y en perfecto estado.", verified: true }
+        ];
+
+        let likedProducts = new Set();
+        let currentReviewPage = 0;
+        const reviewsPerPage = 4;
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = products.map(product => {
+                const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+                return `
+                    <div class="product-card" onclick="openModal(${product.id})">
+                        <div class="product-image">
+                            <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300?text=${encodeURIComponent(product.name)}'">
+                            ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+                            <button class="like-btn ${likedProducts.has(product.id) ? 'liked' : ''}" onclick="toggleLike(event, ${product.id})">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="product-description">${product.description}</p>
+                            <div class="rating">
+                                <div class="stars">
+                                    ${[...Array(5)].map((_, i) => `
+                                        <svg class="star ${i < Math.floor(product.rating) ? '' : 'empty'}" viewBox="0 0 24 24">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                    `).join('')}
+                                </div>
+                                <span class="review-count">(${product.reviews})</span>
+                            </div>
+                            <div class="price-section">
+                                <span class="price">$${product.price.toLocaleString()}</span>
+                                ${product.originalPrice ? `<span class="original-price">$${product.originalPrice.toLocaleString()}</span>` : ''}
+                            </div>
+                            <button class="btn btn-secondary">Ver Detalles</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const modal = document.getElementById('productModal');
+            const modalContent = document.getElementById('modalContent');
+
+            const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+
+            modalContent.innerHTML = `
+                <div class="modal-grid">
+                    <div class="modal-image">
+                        <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300?text=${encodeURIComponent(product.name)}'">
+                    </div>
+                    <div class="modal-details">
+                        <h2>${product.name}</h2>
+                        <div class="rating">
+                            <div class="stars">
+                                ${[...Array(5)].map((_, i) => `
+                                    <svg class="star ${i < Math.floor(product.rating) ? '' : 'empty'}" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                `).join('')}
+                            </div>
+                            <span class="review-count">(${product.reviews} reseñas)</span>
+                        </div>
+                        <div class="modal-price">
+                            <span class="price">$${product.price.toLocaleString()}</span>
+                            ${product.originalPrice ? `<span class="original-price">$${product.originalPrice.toLocaleString()}</span>` : ''}
+                            <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">Color: ${product.color}</p>
+                        </div>
+                        <p class="modal-description">${product.description}</p>
+                        <div class="features-list">
+                            <h3>Características:</h3>
+                            <ul>
+                                ${product.features.map(feature => `
+                                    <li><span class="feature-dot"></span> ${feature}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="payment-buttons">
+                            <a href="https://checkout.nequi.wompi.co/l/O697lQ" target="_blank">
+                                <button class="btn btn-nequi">Pagar con Nequi - $${product.price.toLocaleString()}</button>
+                            </a>
+                            <a href="https://paypal.me/CRIPT9/${product.price}" target="_blank">
+                                <button class="btn btn-paypal">Pagar con PayPal - $${product.price.toLocaleString()}</button>
+                            </a>
+                            <button class="btn btn-outline" onclick="closeModal()">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        function renderReviews() {
+            const start = currentReviewPage * reviewsPerPage;
+            const displayedReviews = reviews.slice(start, start + reviewsPerPage);
+            const grid = document.getElementById('reviewsGrid');
+
+            grid.innerHTML = displayedReviews.map(review => `
+                <div class="review-card">
+                    <div class="review-header">
+                        <div>
+                            <div class="review-author">${review.author}</div>
+                            <div class="review-date">${new Date(review.date).toLocaleDateString('es-ES')}</div>
+                        </div>
+                        ${review.verified ? '<span class="verified-badge">Verificado</span>' : ''}
+                    </div>
+                    <div class="review-rating">
+                        ${[...Array(5)].map((_, i) => `
+                            <svg class="star ${i < review.rating ? '' : 'empty'}" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        `).join('')}
+                    </div>
+                    <div class="review-title">${review.title}</div>
+                    <div class="review-comment">${review.comment}</div>
+                </div>
+            `).join('');
+
+            const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = [...Array(totalPages)].map((_, i) => `
+                <button class="${currentReviewPage === i ? 'active' : ''}" onclick="goToReviewPage(${i})">
+                    ${i + 1}
+                </button>
+            `).join('');
+        }
+
+        function goToReviewPage(page) {
+            currentReviewPage = page;
+            renderReviews();
+        }
+
+        function toggleLike(event, productId) {
+            event.stopPropagation();
+            if (likedProducts.has(productId)) {
+                likedProducts.delete(productId);
+            } else {
+                likedProducts.add(productId);
+            }
+            renderProducts();
+        }
+
+        function updateSocialLinks() {
+            document.getElementById('link-tiktok').href = socialLinks.tiktok;
+            document.getElementById('link-whatsapp').href = socialLinks.whatsapp;
+            document.getElementById('link-facebook').href = socialLinks.facebook;
+        }
+
+        document.getElementById('productModal').addEventListener('click', function(event) {
+            if (event.target === this) closeModal();
+        });
+
+        updateSocialLinks();
+        renderProducts();
+        renderReviews();
+    </script>
+
+    <!-- Modal para el Dashboard de Analytics -->
+    <div class="modal" id="trackerModal">
+        <div class="modal-content" style="max-width: 90vw; max-height: 95vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>📊 Dashboard de Tráfico</h2>
+                <button onclick="closeTracker()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <div id="trackerContent"></div>
+        </div>
+    </div>
+
+    <script src="traffic-tracker.js"></script>
+    <script>
+        function openTracker() {
+            const modal = document.getElementById('trackerModal');
+            const content = document.getElementById('trackerContent');
+            const stats = window.trafficTracker.getGlobalStats();
+
+            if (!stats) {
+                content.innerHTML = '<p style="text-align: center; padding: 2rem;">No hay datos de tráfico aún. Navega por la página para generar datos.</p>';
+                modal.classList.add('active');
+                return;
+            }
+
+            const currentSession = window.trafficTracker.getSessionSummary();
+
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Total de Sesiones</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;">${stats.totalSessions}</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Tiempo Promedio en Página</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;">${stats.avgTimeOnPage}s</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Profundidad de Scroll Promedio</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;">${stats.avgScrollDepth}%</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Total de Clics</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;">${stats.totalClicks}</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem; color: #1e293b;">Dispositivos</h3>
+                        ${Object.entries(stats.devices).map(([device, count]) => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                <span>${device}</span>
+                                <strong>${count}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem; color: #1e293b;">Navegadores</h3>
+                        ${Object.entries(stats.browsers).map(([browser, count]) => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                <span>${browser}</span>
+                                <strong>${count}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem; color: #1e293b;">Sistemas Operativos</h3>
+                        ${Object.entries(stats.operatingSystems).map(([os, count]) => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                <span>${os}</span>
+                                <strong>${count}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button onclick="window.trafficTracker.downloadData()" style="padding: 0.75rem 1.5rem; background: #2563eb; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                        📥 Descargar Datos
+                    </button>
+                    <button onclick="window.trafficTracker.clearData(); alert('Datos eliminados'); closeTracker();" style="padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                        🗑️ Limpiar Datos
+                    </button>
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeTracker() {
+            document.getElementById('trackerModal').classList.remove('active');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('trackerModal').addEventListener('click', (e) => {
+            if (e.target.id === 'trackerModal') closeTracker();
+        });
+    </script>
+</body>
+</html>
